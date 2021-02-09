@@ -1,7 +1,5 @@
 # Arch Linux Installation
 
-# TODO for all files mentioned in this guide create separate files under directories corresponding to their place in the system
-
 # TODO more headings for easier referencing and navigation
 
 ## Create a bootable Arch Linux USB
