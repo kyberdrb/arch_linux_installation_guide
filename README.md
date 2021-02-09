@@ -1,7 +1,7 @@
 # Arch Linux Installation
 
-# TODO move this guide in a separate repo
 # TODO for all files mentioned in this guide create separate files under directories corresponding to their place in the system
+
 # TODO more headings for easier referencing and navigation
 
 ## Create a bootable Arch Linux USB
@@ -383,6 +383,8 @@ Install bootloader (systemd-boot):
 
     bootctl install
 
+**TODO create a script that will automatize the creation of 'arch.conf' file that will take as arguments the path to the root partition `/` and an optional argument of the name of the kernel when multiple kernels are installed (but check if it exists in the `/etc/mkinitcpio.d/` dir), e.g. `./generate_bootctl_config.sh /dev/sda2 linux-lqx`**
+
 Generate a system partition UUID, i.e. the partition, where you installed the operating system Arch Linux on, and then use it in the bootloader instead of the partition name (more secure):
 
     echo "title Arch Linux" >> /boot/loader/entries/arch.conf
@@ -400,7 +402,6 @@ Edit bootloader configuration like it is shown below. Ommit the line with "intel
 
     title Arch Linux
     linux /vmlinuz-linux
-    initrd /intel-ucode.img
     initrd /initramfs-linux.img
     options root=PARTUUID=d65b559b-fe10-43e8-8853-09f55b3fa25d rw
 
@@ -481,7 +482,10 @@ Sources:
 Edit locale setting (system and application language):
 	
 	sudo nano /etc/locale.gen
-	# Uncomment entries "en_US.UTF-8 UTF-8" and "en_US.ISO-8859-1"
+
+**TODO do it automatically with 'sed'**
+
+Uncomment entries "en_US.UTF-8 UTF-8" and "en_US.ISO-8859-1"
 
 Save file (Ctrl + O) and exit (Ctrl + X).
 Generate new locale settings
