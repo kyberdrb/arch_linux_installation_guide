@@ -1827,6 +1827,20 @@ In the output of `journalctl --boot` is listed an error message
 Answer:  
 Fixed by upgrading UEFI. **But from Windows**, not from Linux by `fwupd`. I rather do firmware upgrades from Windows because of the better support from the manufacturer.
 
+---
+
+Question:  
+Why didn't I updated firmware on my ADATA SU800 SSD disk?
+
+Answer:  
+I evaluated it as a too risky thing. Official upgrade procedure will likely soft-brick the device and make it temporary unusable. I say temporary, because there are ways to fix this messed up upgrade, but I want to save myself the hassle. The SSD works still very well, and I'm very satisfied with it. For that money, excelent value.
+
+Sources:
+- https://www.adata.com/en/download/410
+- https://www.adata.com/en/ss/software-6/
+- https://www.reddit.com/user/michel_olvera/comments/fzmf2p/adata_su800_firmware_recovery_upgrade/
+
+
 ## Linux hardening
 
 Commands
@@ -1843,7 +1857,39 @@ Shows currently active CPU bugs. In my case they're all related to enabled SMT/H
     grep -r . /sys/devices/system/cpu/vulnerabilities/ | wc -l
     grep -r "Mitigation" /sys/devices/system/cpu/vulnerabilities/ | wc -l
     
-Double check if all security vulnerabilities are mitigated.
+Double check if all security vulnerabilities are mitigated. When you see a "Mitigation" in each of the file, the system is protected by the kernel patches that mitigate these vulnerabilities.
+
+### Checking for other system issues
+
+Log messages:
+
+    journalctl --reverse --since "$(date '+%Y-%m-%d') 00:00:00" --until "$(date '+%Y-%m-%d') 23:59:59" | grep "\<bug\>" | cut -d' ' -f1,2,3,4,5 --complement | sort | uniq | less
+    
+or
+
+    journalctl --reverse --boot | grep "\<bug\>" | cut -d' ' -f1,2,3,4,5 --complement | sort | uniq | less
+
+    i915 0000:00:02.0: [drm] Panel advertises DPCD backlight support, but VBT disagrees. If your backlight controls don't work try booting with i915.enable_dpcd_backlight=1. If your machine needs this, please file a _new_ bug report on drm/i915, see https://gitlab.freedesktop.org/drm/intel/-/wikis/How-to-file-i915-bugs for details.
+    L1TF CPU bug present and SMT on, data leak possible. See CVE-2018-3646 and https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/l1tf.html for details.
+    MDS CPU bug present and SMT on, data leak possible. See https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/mds.html for more details.
+    PCI: Using host bridge windows from ACPI; if necessary, use "pci=nocrs" and report a bug
+    TAA CPU bug present and SMT on, data leak possible. See https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/tsx_async_abort.html for more details.
+
+For more error messages execute command
+
+    journalctl --reverse --boot | grep -e "\<bug\>" -e "\<failed\>" -e "\<off\>" -e "\<rejected\>" -e "\<error\>" | less
+
+For full log output execute command
+
+    journalctl --reverse --boot"
+
+Mitigation
+
+    ./remount_boot_part_as_writable.sh
+    sudo vim /boot/loader/entries/arch.conf
+
+Add in the file flags that will help to mitigate detected vulnerabilities and errors as needed.
+
 
 Sources:
 
