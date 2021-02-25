@@ -888,6 +888,14 @@ If even that doesn't work, use the [`xf86-video-amdgpu`](https://wiki.gentoo.org
 
 With these nomodeset Xorg drivers you can use the [Xorg options in `modprobe.d`](https://wiki.archlinux.org/index.php/AMDGPU#Xorg_configuration) [1](https://jlk.fjfi.cvut.cz/arch/manpages/man/amdgpu.4), [2](https://wiki.archlinux.org/index.php/Xorg#Driver_installation), [3](https://wiki.archlinux.org/index.php/Xorg#AMD).
 
+---
+
+To check allocated GPU memory for integrated graphics, execute command
+
+    lspci -vvv -s $(lspci | grep VGA | cut -d' ' -f1)
+
+https://www.cyberciti.biz/faq/howto-find-linux-vga-video-card-ram/
+
 ### Install desktop environment
 
 XFCE4
@@ -1773,7 +1781,9 @@ Question:
 In the output of `journalctl --boot` and in the terminal login screen is listed an error message **`Bluetooth: hci0: Reading supported features failed (-16)`**
 
 Answer:  
-No answer for that. `iwlwifi` and `iwlwifi-next` failed at compilation. Trying `linux-firmware-iwlwifi-git`
+Installing `linux-firmware-iwlwifi-git` fixes the issue with the firmware. Possible reasons for that is that at the time of writing (02/2020) the `linux-firmware` provided `iwlwifi` firmware from 2014 for my bluetooth device, whereas `linux-firmware-iwlwifi-git` reported firmware version from 2018.
+
+    Bluetooth: hci0: Firmware revision 0.0 build 10 week 41 2018
 
 Sources:
 - https://bbs.archlinux.org/viewtopic.php?id=126603
@@ -1811,8 +1821,8 @@ Sources:
 Question:  
 In the output of `journalctl --boot` is listed an error message
 
-    DMAR: [Firmware Bug]: No firmware reserved region can cover this RMRR [SOME_ADDRESS_RANGE_WHICH_I_DO_NOT_REMEMBER], contact BIOS vendor for fixes
-    DMAR: [Firmware Bug]: Your BIOS is broken; bad RMRR [SOME_ADDRESS_RANGE_WHICH_I_DO_NOT_REMEMBER]
+    DMAR: [Firmware Bug]: No firmware reserved region can cover this RMRR [0x000000a9800000 end: 0x000000abffffff], contact BIOS vendor for fixes
+    DMAR: [Firmware Bug]: Your BIOS is broken; bad RMRR [0x000000a9800000 end: 0x000000abffffff]
 
 Answer:  
 Fixed by upgrading UEFI. **But from Windows**, not from Linux by `fwupd`. I rather do firmware upgrades from Windows because of the better support from the manufacturer.
