@@ -1756,6 +1756,100 @@ Sources:
 Alternative:
 - XFCE Session Restore: not fully functioning (some applications don't open, e.g. Atom) - XFCE save session: https://docs.xfce.org/xfce/xfce4-session/preferences
 
+---
+
+Question:  
+In the output of `journalctl --boot` is listed an error message **`iwlwifi 0000:01:00.0: No beacon heard and the time event is over already...`**
+
+Answer:  
+Fixed by upgrading UEFI. **But from Windows**, not from Linux by `fwupd`. I rather do firmware upgrades from Windows because of the better support from the manufacturer.
+
+Sources:  
+- https://bugs.archlinux.org/task/58457
+
+---
+
+Question:  
+In the output of `journalctl --boot` and in the terminal login screen is listed an error message **`Bluetooth: hci0: Reading supported features failed (-16)`**
+
+Answer:  
+No answer for that. `iwlwifi` and `iwlwifi-next` failed at compilation. Trying `linux-firmware-iwlwifi-git`
+
+Sources:
+- https://bbs.archlinux.org/viewtopic.php?id=126603
+- https://wiki.archlinux.org/index.php/Bluetooth
+- https://wiki.archlinux.org/index.php/Blueman
+- https://wiki.archlinux.org/index.php/Laptop/Dell#Latitude
+- https://aur.archlinux.org/packages/iwlwifi/
+- https://aur.archlinux.org/packages/iwlwifi-next/
+- https://duckduckgo.com/?q=arch+iwlwifi&ia=web
+- https://aur.archlinux.org/packages/linux-firmware-iwlwifi-git/
+
+---
+
+Question:  
+In the output of `journalctl --boot` is listed an error message **`psi: task underflow!`**
+
+Answer:  
+Disable `psi` in kernel parameters. In my case, I'm using `systemd-boot`, so I appended `psi=0` to the `/boot/loader/entries/arch.conf`
+
+    title ARCH LINUX
+    linux /vmlinuz-linux-tkg-muqss-skylake
+    initrd /intel-ucode.img
+    initrd /initramfs-linux-tkg-muqss-skylake.img
+    options root=PARTUUID=f4e9c51b-06a6-46e0-9af3-0d8f227a8917 rw psi=0
+
+Sources:
+- https://ck-hack.blogspot.com/2018/12/linux-420-ck1-muqss-version-0185-for.html?showComment=1546575567073#c4526898740671031723
+- https://github.com/torvalds/linux/tree/master/Documentation/admin-guide
+- https://github.com/torvalds/linux/blob/master/Documentation/admin-guide/kernel-parameters.txt
+- https://wiki.archlinux.org/index.php/Kernel_parameters#systemd-boot
+- https://wiki.archlinux.org/index.php/Systemd-boot#Kernel_parameters_editor_with_password_protection
+
+---
+
+Question:  
+In the output of `journalctl --boot` is listed an error message
+
+    DMAR: [Firmware Bug]: No firmware reserved region can cover this RMRR [SOME_ADDRESS_RANGE_WHICH_I_DO_NOT_REMEMBER], contact BIOS vendor for fixes
+    DMAR: [Firmware Bug]: Your BIOS is broken; bad RMRR [SOME_ADDRESS_RANGE_WHICH_I_DO_NOT_REMEMBER]
+
+Answer:  
+Fixed by upgrading UEFI. **But from Windows**, not from Linux by `fwupd`. I rather do firmware upgrades from Windows because of the better support from the manufacturer.
+
+## Linux hardening
+
+Commands
+
+    lscpu | grep --ignore-case vulnerability
+
+If each of the vulnerability has a "Mitigations", then you're protected. Enabled SMT/HyperThreading might be still a source of some security vulnerabilities, though.
+
+    journalctl --boot | grep --ignore-case "CPU bug"
+    
+Shows currently active CPU bugs. In my case they're all related to enabled SMT/HyperThreading.
+
+    grep -r . /sys/devices/system/cpu/vulnerabilities/
+    grep -r . /sys/devices/system/cpu/vulnerabilities/ | wc -l
+    grep -r "Mitigation" /sys/devices/system/cpu/vulnerabilities/ | wc -l
+    
+Double check if all security vulnerabilities are mitigated.
+
+Sources:
+
+- https://wiki.archlinux.org/index.php/Security
+- https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/l1tf.html
+- https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/mds.html
+- https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/tsx_async_abort.html
+- https://askubuntu.com/questions/1250040/how-do-i-fix-mds-cpu-bug-present-and-smt-on-data-leak-possible-errors-from-lo/1250060#1250060
+- https://www.cyberciti.biz/faq/check-linux-server-for-spectre-meltdown-vulnerability/
+- https://forum.linuxfoundation.org/discussion/856998/lfs201-chapter-11-sys-devices-system-cpu-vulnerabilities
+- https://lwn.net/Articles/785934/
+- https://unix.stackexchange.com/questions/554908/disable-spectre-and-meltdown-mitigations/554922#554922
+- https://askubuntu.com/questions/1248273/lscpu-vulnerabilities#1248288
+- https://software.intel.com/content/www/us/en/develop/articles/intel-trusted-execution-technology-intel-txt-enabling-guide.html
+- https://www.techulator.com/resources/6372-How-enable-NX-or-XD-option-BIOS-install-Windows-8-RP.aspx
+- https://access.redhat.com/solutions/2936741
 
 ## Sources
 
