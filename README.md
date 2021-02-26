@@ -1781,7 +1781,7 @@ Question:
 In the output of `journalctl --boot` and in the terminal login screen is listed an error message **`Bluetooth: hci0: Reading supported features failed (-16)`**
 
 Answer:  
-Installing `linux-firmware-iwlwifi-git` fixes the issue with the firmware. Possible reasons for that is that at the time of writing (02/2020) the `linux-firmware` provided `iwlwifi` firmware from 2014 for my bluetooth device, whereas `linux-firmware-iwlwifi-git` reported firmware version from 2018.
+Installing `linux-firmware-iwlwifi-git` fixes the issue with the firmware and removes the error message from the `journalctl` logs. Possible reasons for that is that at the time of writing (02/2020) the `linux-firmware` provided `iwlwifi` firmware from 2014 for my bluetooth device, whereas `linux-firmware-iwlwifi-git` reported firmware version from 2018.
 
     Bluetooth: hci0: Firmware revision 0.0 build 10 week 41 2018
 
@@ -1860,6 +1860,8 @@ Shows currently active CPU bugs. In my case they're all related to enabled SMT/H
     grep -r "Mitigation" /sys/devices/system/cpu/vulnerabilities/ | wc -l
     
 Double check if all security vulnerabilities are mitigated. When you see a "Mitigation" in each of the file, the system is protected by the kernel patches that mitigate these vulnerabilities.
+
+As soon as I disabled HyperThreading, these `CPU bug` error messages didn't display as well, so disabling SMT/HyperThreading makes the system more secure.
 
 ### Checking for other system issues
 
