@@ -1839,6 +1839,8 @@ Sources:
 - https://www.adata.com/en/download/410
 - https://www.adata.com/en/ss/software-6/
 - https://www.reddit.com/user/michel_olvera/comments/fzmf2p/adata_su800_firmware_recovery_upgrade/
+- https://forums.anandtech.com/threads/which-firmware-for-adata-su800-ssd.2553663/
+- https://blog.elcomsoft.com/2019/01/identifying-ssd-controller-and-nand-configuration/
 
 
 ## Linux hardening
