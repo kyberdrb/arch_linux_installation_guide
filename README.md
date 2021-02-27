@@ -1842,6 +1842,143 @@ Sources:
 - https://forums.anandtech.com/threads/which-firmware-for-adata-su800-ssd.2553663/
 - https://blog.elcomsoft.com/2019/01/identifying-ssd-controller-and-nand-configuration/
 
+---
+
+Fix "Failed to acquire RNG protocol: not found" at boot
+
+    systemctl status systemd-boot-system-token.service
+    systemctl enable systemd-boot-system-token.service -- fails to enable; journalctl reports "systemd[1]: Condition check resulted in Store a System Token in an EFI Variable being skipped."
+    sudo bootctl random-seed -- doesn't help, message still present
+    
+Leaving it as it is. Maybe they will fix this error and informational messager in the version 248. 
+
+Therefore I'll not add the flag `random-seed-mode off` in `/boot/loader/loader.conf` which might possibly fix this issue.
+
+I'll wait until systemd 248 is out.
+
+- https://github.com/systemd/systemd/issues/13503#issuecomment-529545326
+- https://github.com/systemd/systemd/issues/13603
+- [The fix is close...](https://github.com/systemd/systemd/commit/391719682bf68134b01cf422eb92e3ec4686fa7b)
+- [bootctl random-seed + systemd-boot-system-token.service failing to start]https://bbs.archlinux.org/viewtopic.php?pid=1864646#p1864646
+- https://wiki.archlinux.org/index.php/Systemd-boot#Loader_configuration
+- [Failed to start Store a System Token in an EFI Variable.](https://bbs.archlinux.org/viewtopic.php?id=250379)
+
+---
+
+added `intremap=no_x2apic_optout` to the `/boot/loader/entries/arch.conf` to the `options` line.
+
+Reason: fixing error messages in `journalctl`
+
+    ...
+    kernel: DMAR: RMRR base: 0x000000ab53b000 end: 0x000000ab55afff
+    kernel: DMAR: RMRR base: 0x000000ad800000 end: 0x000000afffffff
+    kernel: DMAR-IR: IOAPIC id 2 under DRHD base  0xfed91000 IOMMU 1
+    kernel: DMAR-IR: HPET id 0 under DRHD base 0xfed91000
+    kernel: DMAR-IR: x2apic is disabled because BIOS sets x2apic opt out bit.
+    kernel: DMAR-IR: Use 'intremap=no_x2apic_optout' to override the BIOS setting.
+    kernel: DMAR-IR: Enabled IRQ remapping in xapic mode
+    kernel: x2apic: IRQ remapping doesn't support X2APIC mode
+    ...
+
+- https://stackoverflow.com/questions/51261999/check-if-vt-d-iommu-has-been-enabled-in-the-bios-uefi/51266134#51266134
+
+After the flag
+
+    ...
+    kernel: DMAR-IR: IOAPIC id 2 under DRHD base  0xfed91000 IOMMU 1
+    kernel: DMAR-IR: HPET id 0 under DRHD base 0xfed91000
+    kernel: DMAR-IR: Queued invalidation will be enabled to support x2apic and Intr-remapping.
+    kernel: DMAR-IR: Enabled IRQ remapping in x2apic mode
+    kernel: x2apic enabled
+    kernel: Switched APIC routing to cluster x2apic.
+    ...
+
+---
+
+journalctl reports
+
+    ACPI: [Firmware Bug]: BIOS _OSI(Linux) query ignored
+
+- https://bbs.archlinux.org/viewtopic.php?pid=1930423#p1930423
+- https://shantanugoel.com/2008/08/03/hi-bios-my-name-is-linux-or-is-it/
+
+Solution: add flag `acpi_osi=Linux` to the `options` line in the `/boot/loader/entries/arch.conf`
+
+- https://bugzilla.kernel.org/show_bug.cgi?id=69921
+- https://bugs.launchpad.net/ubuntu/+source/linux/+bug/1275985
+
+After the flag
+
+    ...
+    ACPI: [Firmware Bug]: BIOS _OSI(Linux) query honored via cmdline
+    ...
+
+...and the rest was still the same.
+
+But after that the login screen of xscreensaver/xfce4-screensaver froze before displaying leaving the system unusable, so don't do it and leave it as it is. Don't add this flag otherwise you risk an unstable system.
+
+---
+
+Automatic Bluetooth enabling in order to prevent error messages in `journalctl`
+
+    sudo vim /etc/bluetooth/main.conf
+
+    ...
+    AutoEnable=true
+    ...
+
+Enable Bluetooth services
+
+    systemctl enable bluetooth.service
+    systemctl enable bluetooth-mesh.service
+    systemctl enable blueman-mechanism.service
+
+Edit modules at boot - early modesetting for Bluetooth module
+
+    sudo vim /etc/mkinitcpio.conf
+
+Append to the `MODULES` list the `bluetooth` module found by `lsmod | less` but missing in the output
+
+`lsmod | less` output
+
+    bnep                   28672  2
+    ...
+    btusb                  69632  0
+    btrtl                  28672  1 btusb
+    ...
+    btbcm                  20480  1 btusb
+    ...
+    bluetooth             745472  16 btrtl,btintel,btbcm,bnep,btusb
+
+Appended Intel bluetooth module in `/etc/mkinitcpio.conf`
+
+    MODULES=(i915 btintel)
+
+Reboot
+
+- https://askubuntu.com/questions/938228/how-to-enable-bluetooth-at-startup-16-04-lts/938235#938235
+- https://wiki.archlinux.org/index.php/Bluetooth#Auto_power-on_after_boot
+- https://bbs.archlinux.org/viewtopic.php?pid=1861643#p1861643
+- https://www.cyberciti.biz/faq/add-remove-list-linux-kernel-modules/
+- https://askubuntu.com/questions/1278580/bluetooth-blueman-manager-not-working-on-ubuntu-20-04-1-lts
+- https://superuser.com/questions/1358968/bluetooh-hci0-command-0x1009-tx-timeout/1497228#1497228
+- https://bbs.archlinux.org/viewtopic.php?id=238924
+
+Anyway, none of these solutions really worked and my Bluetooth device became unusable - detected but can't enable Bluetooth: `blueman-manager` reports no default Bluetooth adapters. Therefore I disabled the Bluetooth device in BIOS/UEFI. No more problems.
+
+---
+
+`journalctl` reports an error
+
+    kernel: DMAR: [INTR-REMAP] Request device [f0:1f.0] fault index 0 [fault reason 37] Blocked a compatibility format interrupt request
+    kernel: DMAR: DRHD: handling fault status reg 2
+
+Solution: Disable VT-d/Virtualization for Directed I/O in BIOS/UEFI
+
+Maybe adding a kernel flag `intel_iommu=igfx_off` but I didn't test it.
+
+https://bbs.archlinux.org/viewtopic.php?pid=1375998#p1375998
+
 
 ## Linux hardening
 
