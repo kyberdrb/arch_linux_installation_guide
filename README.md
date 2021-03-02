@@ -451,7 +451,7 @@ or
     
 Set time:
 
-    sudo ln -sf /usr/share/zoneinfo/Europe/Bratislava /etc/localtime
+    sudo ln -sf /usr/share/zoneinfo/Europe/Berlin /etc/localtime
     sudo hwclock --systohc
     
 ### Configure `vim`
