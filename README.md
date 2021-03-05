@@ -404,6 +404,14 @@ Edit bootloader configuration like it is shown below. Ommit the line with "intel
     linux /vmlinuz-linux
     initrd /initramfs-linux.img
     options root=PARTUUID=d65b559b-fe10-43e8-8853-09f55b3fa25d rw
+    
+Create seed for the random number generator - possible prevention against systemd booting message 'Failed to acquire RNG protocol: not found' [1](https://github.com/systemd/systemd/issues/13503#issuecomment-529525157) and agains journalctl message about 'crng not initialized' - which is not a problem: the systemd will initialize anyway
+
+    bootctl random-seed
+
+or later, as a user
+
+    sudo bootctl random-seed
 
 ****************************************
  
@@ -2047,6 +2055,39 @@ Sources:
 - https://software.intel.com/content/www/us/en/develop/articles/intel-trusted-execution-technology-intel-txt-enabling-guide.html
 - https://www.techulator.com/resources/6372-How-enable-NX-or-XD-option-BIOS-install-Windows-8-RP.aspx
 - https://access.redhat.com/solutions/2936741
+
+---
+
+Question:  
+When running `mkinitcpio` or upgrading the kernel, during the process appears a message `WARNING: Possibly missing firmware for module: xhci_pci`.
+
+Answer:
+Test the USB ports. If all of the USB ports are working, you can safely ignore this message.
+
+If some of the USB doesn't detect a USB device, install the firmware for Renesas USB3.0 Controllers [`upd72020x-fw`](https://aur.archlinux.org/packages/upd72020x-fw/)
+
+- https://github.com/linux-surface/linux-surface/issues/306#issuecomment-709203268
+- https://www.reddit.com/r/archlinux/comments/k71mlr/warning_possibly_missing_firmware_for_module_xhci/geoag7c/?utm_source=reddit&utm_medium=web2x&context=3
+- https://bbs.archlinux.org/viewtopic.php?pid=1922334#p1922334
+
+---
+
+Question:  
+When installing the skylake optimized tkg kernel with muqss be running `pikaur -Sy linux-tkg-muqss-skylake linux-tkg-muqss-skylake-headers` I got a lot of errors in the sense of:
+    
+    linux-tkg-muqss-skylake: /usr/lib/modules/5.11.3-131-tkg-MuQSS/... exists in filesystem (owned by linux-tkg-muqss)
+
+and
+    
+    linux-tkg-muqss-skylake-headers: /usr/lib/modules/5.11.3-131-tkg-MuQSS/... exists in filesystem (owned by linux-tkg-muqss-headers)
+
+Answer:  
+The skylake kernel specialization of the same kernel didn't install because I had the generic packages `linux-tkg-muqss` and `linux-tkg-muqss-headers` installed. Uninstalling them and installing the skylake optimized kernel again solved the problem.
+
+    pikaur -Runs linux-tkg-muqss linux-tkg-muqss-headers
+    pikaur -Sy linux-tkg-muqss-skylake linux-tkg-muqss-skylake-headers
+    
+- https://joshtronic.com/2020/09/13/reflector-service-exists-in-filesystem-owned-by-reflector-timer/
 
 ## Sources
 
