@@ -1421,6 +1421,24 @@ Fix:
 
 Close the Keyboard settings window and test the new sleep-keyboard shortcut. Close the lid. Open the lid. The computer will resume to the xscreensaver password prompt after any amount of time. I don't know what causes it.
 
+It seems that the problem is much deeper than I thought. It looks like it's a firmware or CPU issue. Nevermind. Following procedure fixed the awakening from sleep for my laptop:
+
+- cpupower cpupower-gui turbostat
+    - Changing CPU frequency and disabling C-States, i.e. locking the CPU at the highest turbo frequency, using kernel parameters to resolve the issue of rebooting at awakening laptop from sleep.
+      - added/appended kernel parameters into `/boot/loader/entries/arch.conf` next to `options`:
+
+              quiet splash acpi_sleep=nonvs intel_idle.max_cstate=0 processor.max_cstate=0 idle=poll
+
+    - Using installed utilities to monitor CPU frequency
+    - Using Sensor Monitor to check CPU temperature
+    - Sources
+        - https://wiki.archlinux.org/index.php/CPU_frequency_scaling#cpupower
+        - https://github.com/torvalds/linux/blob/master/Documentation/admin-guide/kernel-parameters.txt
+        - https://askubuntu.com/questions/716957/what-do-the-nomodeset-quiet-and-splash-kernel-parameters-mean/716966#716966
+        - https://unix.stackexchange.com/questions/291546/laptop-reboots-instead-of-resuming-from-systemd-suspend-when-on-battery-power-s/435937#435937
+        - https://bugzilla.kernel.org/show_bug.cgi?id=108801#c46
+        - https://xuantuyen311.wordpress.com/2015/08/01/disablce-c-states-in-ubuntu/ - maybe the most helpful article
+
 ****************************************
 PROXY
 
