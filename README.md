@@ -1435,7 +1435,7 @@ It seems that the problem is much deeper than I thought. It looks like it's a fi
     - Changing CPU frequency and disabling C-States, i.e. locking the CPU at the highest turbo frequency, using kernel parameters to resolve the issue of rebooting at awakening laptop from sleep.
       - added/appended kernel parameters into `/boot/loader/entries/arch.conf` next to `options`:
 
-              quiet splash acpi_sleep=nonvs intel_idle.max_cstate=0 processor.max_cstate=0 idle=poll
+              options <other kernel parameters> quiet splash acpi_sleep=nonvs intel_idle.max_cstate=0 processor.max_cstate=0 idle=poll
 
     - Using installed utilities to monitor CPU frequency
     - Using Sensor Monitor to check CPU temperature
@@ -1446,6 +1446,35 @@ It seems that the problem is much deeper than I thought. It looks like it's a fi
         - https://unix.stackexchange.com/questions/291546/laptop-reboots-instead-of-resuming-from-systemd-suspend-when-on-battery-power-s/435937#435937
         - https://bugzilla.kernel.org/show_bug.cgi?id=108801#c46
         - https://xuantuyen311.wordpress.com/2015/08/01/disablce-c-states-in-ubuntu/ - maybe the most helpful article
+
+---
+
+Question:  
+My system doesn't boot after upgrading to 5.11 kernel. Booting ends up with a kernel panic.
+
+Answer:  
+Add kernel flag `module_blacklist=dell_wmi_sysman`, but that results in a slower system. See `options` line in `/boot/loader/entries/arch.conf`
+
+    options <other kernel parameters> module_blacklist=dell_wmi_sysman
+
+Then any of the 5.11.X kernels booted up.  
+Alternatively you can specify for kernel parameters `acpi=off` or `iommu=off` and see, how your system behaves: Does it boot? Is the responsiveness different? Slower?
+
+A better solution is to either switch to the latest 5.10.X _stable_ kernel version, or to Linux _LTS (Long-Term Support)_ kernel.
+
+Sources:
+- https://duckduckgo.com/?q=dell+5.11+kernel+panic&ia=web
+- https://bbs.archlinux.org/viewtopic.php?id=264340
+- https://bugzilla.kernel.org/show_bug.cgi?id=212069
+- https://wiki.gentoo.org/wiki/IOMMU_SWIOTLB
+- https://bbs.archlinux.org/viewtopic.php?id=264136
+- https://github.com/torvalds/linux/blob/master/Documentation/admin-guide/kernel-parameters.txt
+- https://wiki.archlinux.org/index.php/Kernel_module#Using_kernel_command_line_2
+- https://wiki.archlinux.org/index.php/Intel_graphics#Enable_GuC_/_HuC_firmware_loading
+- https://wiki.archlinux.org/index.php/Intel_GVT-g#Prerequisite
+- https://askubuntu.com/questions/922140/how-to-know-i-have-to-blacklist-acer-wmi/922141#922141
+- [Bug 211895 - dell_wmi_sysman causes unbootable system](https://bugzilla.kernel.org/show_bug.cgi?id=211895)
+- [FS#69702 - [linux][linux-zen] 5.11, dell_wmi_sysman causes unbootable system](https://bugs.archlinux.org/task/69702)
 
 ****************************************
 PROXY
