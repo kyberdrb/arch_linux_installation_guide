@@ -417,7 +417,7 @@ For legacy system we need to install GRUB bootloader
 
 Generate init file for GRUB
 	
-	mkinitcpio -p linux
+	mkinitcpio --allpresets
 	grub-mkconfig -o /boot/grub/grub.cfg
 ****************************************
 
@@ -598,8 +598,7 @@ Save and exit by pressing `ESC + :wq`
 
 Regenerate `initramfs` image
 
-    KERNEL_NAME=$(cat /boot/loader/entries/arch.conf | grep vmlinuz | cut -d'/' -f2 | cut -d'-' -f1 --complement)
-    sudo mkinitcpio -p $KERNEL_NAME
+    sudo mkinitcpio --allpresets
 	
 Close all programms and reboot
 
@@ -618,12 +617,14 @@ Edit this file...
 ... with this content:
 	
 	options i915 enable_guc=2
+  options i915 enable_gvt=0
+
+GVT-d and GuC are mutually exclusive. When both are enabled, a kernel panic occurs and the system is unable to boot. Therefore I disable GVT-d explicitly to prevent unpleasant surprises.
 	
 Then regenerate the initramfs:
 
     ./remount_boot_part_as_writable.sh
-    KERNEL_NAME=$(cat /boot/loader/entries/arch.conf | grep vmlinuz | cut -d'/' -f2 | cut -d'-' -f1 --complement)
-    sudo mkinitcpio -p $KERNEL_NAME
+    sudo mkinitcpio --allpresets
     
 Close all open programs and reboot
 
@@ -801,8 +802,15 @@ Regenerate the initramfs:
 **TODO this series of commands repeats here multiple times - abstract this into one file which will only be referenced from here multiple times as a link**
 
     ./remount_boot_part_as_writable.sh
+
+Generate for all kernels
+
+    sudo mkinitcpio --allpresets
+
+or only for current kernel
+
     KERNEL_NAME=$(cat /boot/loader/entries/arch.conf | grep vmlinuz | cut -d'/' -f2 | cut -d'-' -f1 --complement)
-    sudo mkinitcpio -p $KERNEL_NAME
+    sudo mkinitcpio --preset $KERNEL_NAME
     
 Close all programs ans reboot
 
