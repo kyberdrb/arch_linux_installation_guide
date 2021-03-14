@@ -404,6 +404,14 @@ Edit bootloader configuration like it is shown below. Ommit the line with "intel
     linux /vmlinuz-linux
     initrd /initramfs-linux.img
     options root=PARTUUID=d65b559b-fe10-43e8-8853-09f55b3fa25d rw
+    
+Create seed for the random number generator - possible prevention against systemd booting message 'Failed to acquire RNG protocol: not found' [1](https://github.com/systemd/systemd/issues/13503#issuecomment-529525157) and agains journalctl message about 'crng not initialized' - which is not a problem: the systemd will initialize anyway
+
+    bootctl random-seed
+
+or later, as a user
+
+    sudo bootctl random-seed
 
 ****************************************
  
@@ -1421,6 +1429,24 @@ Fix:
 
 Close the Keyboard settings window and test the new sleep-keyboard shortcut. Close the lid. Open the lid. The computer will resume to the xscreensaver password prompt after any amount of time. I don't know what causes it.
 
+It seems that the problem is much deeper than I thought. It looks like it's a firmware or CPU issue. Nevermind. Following procedure fixed the awakening from sleep for my laptop:
+
+- cpupower cpupower-gui turbostat
+    - Changing CPU frequency and disabling C-States, i.e. locking the CPU at the highest turbo frequency, using kernel parameters to resolve the issue of rebooting at awakening laptop from sleep.
+      - added/appended kernel parameters into `/boot/loader/entries/arch.conf` next to `options`:
+
+              quiet splash acpi_sleep=nonvs intel_idle.max_cstate=0 processor.max_cstate=0 idle=poll
+
+    - Using installed utilities to monitor CPU frequency
+    - Using Sensor Monitor to check CPU temperature
+    - Sources
+        - https://wiki.archlinux.org/index.php/CPU_frequency_scaling#cpupower
+        - https://github.com/torvalds/linux/blob/master/Documentation/admin-guide/kernel-parameters.txt
+        - https://askubuntu.com/questions/716957/what-do-the-nomodeset-quiet-and-splash-kernel-parameters-mean/716966#716966
+        - https://unix.stackexchange.com/questions/291546/laptop-reboots-instead-of-resuming-from-systemd-suspend-when-on-battery-power-s/435937#435937
+        - https://bugzilla.kernel.org/show_bug.cgi?id=108801#c46
+        - https://xuantuyen311.wordpress.com/2015/08/01/disablce-c-states-in-ubuntu/ - maybe the most helpful article
+
 ****************************************
 PROXY
 
@@ -2055,6 +2081,39 @@ Sources:
 - https://software.intel.com/content/www/us/en/develop/articles/intel-trusted-execution-technology-intel-txt-enabling-guide.html
 - https://www.techulator.com/resources/6372-How-enable-NX-or-XD-option-BIOS-install-Windows-8-RP.aspx
 - https://access.redhat.com/solutions/2936741
+
+---
+
+Question:  
+When running `mkinitcpio` or upgrading the kernel, during the process appears a message `WARNING: Possibly missing firmware for module: xhci_pci`.
+
+Answer:
+Test the USB ports. If all of the USB ports are working, you can safely ignore this message.
+
+If some of the USB doesn't detect a USB device, install the firmware for Renesas USB3.0 Controllers [`upd72020x-fw`](https://aur.archlinux.org/packages/upd72020x-fw/)
+
+- https://github.com/linux-surface/linux-surface/issues/306#issuecomment-709203268
+- https://www.reddit.com/r/archlinux/comments/k71mlr/warning_possibly_missing_firmware_for_module_xhci/geoag7c/?utm_source=reddit&utm_medium=web2x&context=3
+- https://bbs.archlinux.org/viewtopic.php?pid=1922334#p1922334
+
+---
+
+Question:  
+When installing the skylake optimized tkg kernel with muqss be running `pikaur -Sy linux-tkg-muqss-skylake linux-tkg-muqss-skylake-headers` I got a lot of errors in the sense of:
+    
+    linux-tkg-muqss-skylake: /usr/lib/modules/5.11.3-131-tkg-MuQSS/... exists in filesystem (owned by linux-tkg-muqss)
+
+and
+    
+    linux-tkg-muqss-skylake-headers: /usr/lib/modules/5.11.3-131-tkg-MuQSS/... exists in filesystem (owned by linux-tkg-muqss-headers)
+
+Answer:  
+The skylake kernel specialization of the same kernel didn't install because I had the generic packages `linux-tkg-muqss` and `linux-tkg-muqss-headers` installed. Uninstalling them and installing the skylake optimized kernel again solved the problem.
+
+    pikaur -Runs linux-tkg-muqss linux-tkg-muqss-headers
+    pikaur -Sy linux-tkg-muqss-skylake linux-tkg-muqss-skylake-headers
+    
+- https://joshtronic.com/2020/09/13/reflector-service-exists-in-filesystem-owned-by-reflector-timer/
 
 ## Sources
 
