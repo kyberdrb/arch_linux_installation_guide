@@ -1108,7 +1108,7 @@ There are multiple ways how to enable VAAPI hardware acceleration on the Linux p
 
 For Intel HD 520 there are at least three VAAPI drivers I know of that enable hardware accelerated video playback:
 1. `intel-media-sdk` `intel-media-driver` `intel-compute-runtime` `ocl-icd` `lib32-ocl-icd` `opencl-headers`
-1. `libva-intel-driver` `lib32-libva-intel-driver`
+1. **`libva-intel-driver` `lib32-libva-intel-driver`**
 1. `libva-intel-driver-hybrid` `intel-hybrid-codec-driver`
 
 Package `intel-media-sdk` add support for Intel Quick Sync hardware acceleration for videos. That might sound good, but it doesn't accelerate the VP9 codec, so the videos and steams encoded in this codec are decoded via CPU, not GPU, which results to higher power consumption and stuttering. So, I'll rather stick to the `hybrid` drivers because of the VP9 hardware acceleration. Package `intel-media-driver` has, at the time of writing, reported some [issues with Firefox under Xorg](https://www.linuxquestions.org/questions/debian-26/intel-10th-gen-comet-lake-graphics-driver-issues-4175683860/#post6178511). There is workaround - to disable sandboxing for web media content - which might me a serious security issue. [1](https://wiki.archlinux.org/index.php/Firefox#Hardware_video_acceleration), [2](https://mastransky.wordpress.com/2020/06/03/firefox-on-fedora-finally-gets-va-api-on-wayland/). OpenCL headers are not necessary, but what if I'll develop something with it? Who knows...
@@ -1125,15 +1125,11 @@ and also `libva-intel-driver-hybrid` contains `intel-hybrid-codec-driver` as an 
 `libva-intel-driver-hybrid` conflicts with the vanilla `libva-intel-driver`  
 Both of these packages doesn't have their 32-bit alternatives, i. e. `lib32-libva-intel-driver-hybrid` / `lib32-intel-hybrid-codec-driver`
 
-[`intel-hybrid-codec-driver`](https://aur.archlinux.org/packages/intel-hybrid-codec-driver/) failed at compilation and at the time of writing it was last updated at 21.12.2019, therefore I'm using the `intel-hybrid-codec-driver-gcc10` version.
+[`intel-hybrid-codec-driver`](https://aur.archlinux.org/packages/intel-hybrid-codec-driver/) failed at compilation and at the time of writing it was last updated at 21.12.2019, and the  `intel-hybrid-codec-driver-gcc10` was removed, therefore I'm using the `libva-intel-driver` `lib32-libva-intel-driver` combination.
 
 As the final decision I chose the third option - the hybrid drivers:
 
-    pikaur -Syy libva-intel-driver-hybrid intel-hybrid-codec-driver-gcc10
-
-https://aur.archlinux.org/packages/libva-intel-driver-hybrid/
-
-https://aur.archlinux.org/packages/intel-hybrid-codec-driver-gcc10/
+    pikaur -Syy libva-intel-driver lib32-libva-intel-driver
 
 Verify if the VAAPI driver is present and the formats that are accelerated through VAAPI.
 
@@ -1153,8 +1149,10 @@ sudo vim /etc/environment
 
 Explicitly define the VAAPI driver name and try to enable hardware acceleration for MPEG4 format explicitely by defining a new [environment variable](https://wiki.archlinux.org/index.php/Hardware_video_acceleration#Configuring_VA-API):
 
+    ...
     LIBVA_DRIVER_NAME=i965
     VAAPI_MPEG4_ENABLED=true
+    ...
 
 Reboot
 
