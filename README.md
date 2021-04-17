@@ -616,7 +616,9 @@ If everything goes well, you will see the destop environment as if nothing chang
 
 Now we can proceed to the modesetting driver configuration.
 
-**Enable GuC and HuC**
+**Enable GuC and HuC - dangerous: taints the kernel**
+
+More about tainting kernel here: [[1]](https://duckduckgo.com/?q=Setting+dangerous+option+enable_guc+-+tainting+kernel&ia=web), [[2]](https://unix.stackexchange.com/questions/118116/what-is-a-tainted-kernel-in-linux#118117), [[3]](https://bugs.freedesktop.org/show_bug.cgi?id=111918)
 
 Edit this file...
 	
@@ -625,7 +627,7 @@ Edit this file...
 ... with this content:
 	
 	options i915 enable_guc=2
-  options i915 enable_gvt=0
+        options i915 enable_gvt=0
 
 GVT-d and GuC are mutually exclusive. When both are enabled, a kernel panic occurs and the system is unable to boot. Therefore I disable GVT-d explicitly to prevent unpleasant surprises.
 	
