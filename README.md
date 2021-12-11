@@ -522,12 +522,16 @@ Wait until the updating completes. The script will automatically configure and u
 
 Common graphics drivers and Vulkan support
 
-    pacman -S mesa lib32-mesa vulkan-icd-loader lib32-vulkan-icd-loader vulkan-headers vulkan-tools mesa-demos lib32-mesa-demos
+    pacman -S mesa lib32-mesa vulkan-icd-loader lib32-vulkan-icd-loader vulkan-headers vulkan-tools mesa-utils lib32-mesa-utils
     pikaur -Syy vkmark-git assimp
     
 - `vulkantools` provides the `vulkaninfo` utility to verify whether Vulkan API is enabled.
-- `mesa-demos` and `lib32-mesa-demos` provide the `glxgears` utility for benchmarking [1](https://bbs.archlinux.org/viewtopic.php?pid=838572#p838572)
-    - run `glxgears` utility as `vblank_mode=0 glxgears -fullscreen`
+- `mesa-utils` and `lib32-mesa-utils` provide the `glxgears` utility for benchmarking [1](https://bbs.archlinux.org/viewtopic.php?pid=838572#p838572)
+    - run `glxgears` utility as
+    
+          vblank_mode=0 glxgears -fullscreen
+		
+      for maximum FPS
 - `vkmark-git` contains the utility `vkmark` which benchmarks GPU performance in Vulkan environment.
     - `assimp` package is required, because without it I got an error `vkmark: error while loading shared libraries: libassimp.so.5: cannot open shared object file: No such file or directory`
     
