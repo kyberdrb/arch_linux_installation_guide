@@ -1803,7 +1803,9 @@ Can't update/upgrade system via pacman. Pacman displays these error messages:
     Errors occurred, no packages were upgraded.
 
 Answer:  
-Also see `ARCH_updating_procedure.txt`
+Remount boot partition as `rw` - see https://github.com/kyberdrb/update_arch/blob/master/utils/remount_boot_part_as_writable.sh
+
+Here is a script to run the entire update procedure without user intervention (unattended)- https://github.com/kyberdrb/update_arch
 
 ---
 
@@ -1851,6 +1853,8 @@ Answer:
 Installing `linux-firmware-iwlwifi-git` fixes the issue with the firmware and removes the error message from the `journalctl` logs. Possible reasons for that is that at the time of writing (02/2020) the `linux-firmware` provided `iwlwifi` firmware from 2014 for my bluetooth device, whereas `linux-firmware-iwlwifi-git` reported firmware version from 2018.
 
     Bluetooth: hci0: Firmware revision 0.0 build 10 week 41 2018
+    
+Another solution is to disable bluetooth in BIOS/UEFI alltogether, and uninstalling everything bluetooth related in the system.
 
 Sources:
 - https://bbs.archlinux.org/viewtopic.php?id=126603
@@ -2045,6 +2049,16 @@ Solution: Disable VT-d/Virtualization for Directed I/O in BIOS/UEFI
 Maybe adding a kernel flag `intel_iommu=igfx_off` but I didn't test it.
 
 https://bbs.archlinux.org/viewtopic.php?pid=1375998#p1375998
+
+---
+
+Question:  
+At update procedure and/or at upgrade of some package this message gets shown: `Please add your user to the brlapi group.`
+
+Answer:  
+Add user to the group with
+
+    sudo gpasswd -a $USER brlapi
 
 
 ## Linux hardening
