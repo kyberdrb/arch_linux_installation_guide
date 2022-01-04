@@ -8,6 +8,8 @@
 
 1. Download Arch Linux ISO
 
+    - The latest version I tested to boot successfuly was the `archlinux-2021.02.01-x86_64.iso`. The newer ones failed to boot due - kernel panic due to `dell-wmi-sysman` kernel module error
+
 1. Clone it on the USB drive
 
     - Linux
