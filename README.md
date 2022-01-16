@@ -2079,9 +2079,15 @@ Shows currently active CPU bugs. In my case they're all related to enabled SMT/H
     grep -r . /sys/devices/system/cpu/vulnerabilities/ | wc -l
     grep -r "Mitigation" /sys/devices/system/cpu/vulnerabilities/ | wc -l
     
+    find /sys/devices/system/cpu/vulnerabilities/* | nl
+    find /sys/devices/system/cpu/vulnerabilities/* | xargs cat | nl
+    
 Double check if all security vulnerabilities are mitigated. When you see a "Mitigation" in each of the file, the system is protected by the kernel patches that mitigate these vulnerabilities.
 
-As soon as I disabled HyperThreading, these `CPU bug` error messages didn't display as well, so disabling SMT/HyperThreading makes the system more secure.
+As soon as I disabled HyperThreading, these `CPU bug` error messages didn't display as well, so disabling SMT/HyperThreading makes the system more secure at the one hand, at the other hand occasional stutterring and longer waiting times for CPU-bount tasks might appear.
+
+- https://unix.stackexchange.com/questions/456425/what-does-the-bugs-section-of-proc-cpuinfo-actually-show/456446#456446
+- https://wiki.archlinux.org/title/Security#Hardware_vulnerabilities
 
 ### Checking for other system issues
 
