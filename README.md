@@ -1422,6 +1422,8 @@ Configure screen locking
 
 Sometimes when I press `Fn + Insert`, i. e. `Fn + SleepButton` (Insert is my functional Fn-Sleep button) and **close the lid**, then when I open the lid after some time (don't know how long, because immediately after sleep and closing the lid the computer wakes up alright) instead of waking up and displaying the xscreenserver password prompt, **it reboots**.
 
+**_Note: As of April 19th 2022 I use only the default kernel parameter, and I removed the added kernel parameters in `arch.conf`. I will observe, how the sleep and wakeup from sleep will work on my laptop, and whether the sleep issue comes up again._**
+
 Fix:
 
 1. Go to Application Menu - Settings - Keyboard - (tab) Application Shortcuts
@@ -1433,7 +1435,7 @@ Close the Keyboard settings window and test the new sleep-keyboard shortcut. Clo
 
 It seems that the problem is much deeper than I thought. It looks like it's a firmware or CPU issue. Nevermind. Following procedure fixed the awakening from sleep for my laptop:
 
-- cpupower cpupower-gui turbostat
+    - installing packages `cpupower cpupower-gui turbostat`
     - Changing CPU frequency and disabling C-States, i.e. locking the CPU at the highest turbo frequency, using kernel parameters to resolve the issue of rebooting at awakening laptop from sleep.
       - added/appended kernel parameters into `/boot/loader/entries/arch.conf` next to `options`:
 
@@ -1448,6 +1450,8 @@ It seems that the problem is much deeper than I thought. It looks like it's a fi
         - https://unix.stackexchange.com/questions/291546/laptop-reboots-instead-of-resuming-from-systemd-suspend-when-on-battery-power-s/435937#435937
         - https://bugzilla.kernel.org/show_bug.cgi?id=108801#c46
         - https://xuantuyen311.wordpress.com/2015/08/01/disablce-c-states-in-ubuntu/ - maybe the most helpful article
+        - https://kernel.org/doc/html/v5.18-rc1/admin-guide/kernel-parameters.html
+        - https://duckduckgo.com/?q=psi+Enable+or+disable+pressure+stall+information+tracking&ia=web
 
 ---
 
