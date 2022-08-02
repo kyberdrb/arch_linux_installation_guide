@@ -48,19 +48,46 @@
     1. Connect to the internet. Below are the steps for connecting to the wireless and wired network
         - Connect to a Wi-Fi network
     
-            1. Execute command
+            1. Using `wifi-menu`
 
-                    wifi-menu
-    
-            1. Choose the network, confirm profile name and enter password. The Wi-Fi adapter is turned on automatically by the command and the IP address is obtained automatically as well via DHCP.
+                1. Execute command
 
-        - Connect to a wired network
-            The Ethernet should be named similar to `enpXsY` where X and Y are numbers. Wireless adapters have a name in format similar to `wloZ` where Z is a number. Then you need to request an IP address via DHCP
-	
-	            dhcpcd enpXsY
+                  wifi-menu
 
-            an IP address should be assigned to the Ethernet interface.
-	    For manual IP configuration see [Arch Linux Wiki - Network configuration](https://wiki.archlinux.org/index.php/Network_configuration#Static_IP_address)
+                1. Choose the network, confirm profile name and enter password. The Wi-Fi adapter is turned on automatically by the command and the IP address is obtained automatically as well via DHCP.
+
+            - Connect to a wired network
+                The Ethernet should be named similar to `enpXsY` where X and Y are numbers. Wireless adapters have a name in format similar to `wloZ` where Z is a number. Then you need to request an IP address via DHCP
+
+                  dhcpcd enpXsY
+
+                an IP address should be assigned to the Ethernet interface.
+                For manual IP configuration see [Arch Linux Wiki - Network configuration](https://wiki.archlinux.org/index.php/Network_configuration#Static_IP_address)
+
+	    1. Using `iwctl`
+	    
+	        - Non-interactively
+
+		            iwctl device list
+			    
+                        iwctl --passphrase PASSPHRASE station DEVICE connect SSID-NAME_OF_WIFI_NETWORK
+		
+		- Interactively
+	    
+	    	        iwctl
+	    	        device list
+		    
+	            Let's say there is only one wireless device for Wi-Fi and has name `wlan0`
+		    
+	    	        station wlan0 scan
+	    	        station wlan0 get-networks
+	    	        station wlan0 connect SSID-NAME_OF_WIFI_NETWORK
+		    
+	        - Sources
+	            - https://duckduckgo.com/?q=arch+linux+installation+wifi&ia=web
+	            - https://bbs.archlinux.org/viewtopic.php?id=109672
+	            - https://wiki.archlinux.org/title/Installation_guide#Connect_to_the_internet
+	            - https://wiki.archlinux.org/title/Iwd#iwctl
 
     1. Test connectivity:
 	
