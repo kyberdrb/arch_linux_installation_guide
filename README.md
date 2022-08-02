@@ -65,20 +65,25 @@
                 For manual IP configuration see [Arch Linux Wiki - Network configuration](https://wiki.archlinux.org/index.php/Network_configuration#Static_IP_address)
 
 	    1. Using `iwctl`
+
+            1. First, find the device name
+
+                    $ iwctl device list
+
+                Let's say that the previous command outputs only one Wi-Fi network adapter with the name `wlan0`.
 	    
 	        - Non-interactively
 
-		            iwctl device list
-			    
-                        iwctl --passphrase PASSPHRASE station DEVICE connect SSID-NAME_OF_WIFI_NETWORK
+		            Then the command for connecting to a standard wireless home network would be:
+
+			        $ iwctl --passphrase PASSPHRASE station DEVICE connect SSID-NAME_OF_WIFI_NETWORK
 		
-		- Interactively
+		    - Interactively
 	    
-	    	        iwctl
-	    	        device list
-		    
-	            Let's say there is only one wireless device for Wi-Fi and has name `wlan0`
-		    
+	    	        $ iwctl
+
+                And in the `iwd` shell
+
 	    	        station wlan0 scan
 	    	        station wlan0 get-networks
 	    	        station wlan0 connect SSID-NAME_OF_WIFI_NETWORK
