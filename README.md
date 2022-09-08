@@ -292,6 +292,8 @@ fstab using UUIDs:
 	# or maybe
 	
 	genfstab -U -p /mnt >> /mnt/etc/fstab
+	
+	# Source: https://man.archlinux.org/man/genfstab.8
 
 Edit "/etc/fstab" file:
 
