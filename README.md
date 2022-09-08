@@ -287,11 +287,16 @@ Install pacman and the base system:
 
 fstab using UUIDs:
 
+	genfstab -t UUID -p /mnt >> /mnt/etc/fstab
+	
+	# or maybe
+	
 	genfstab -U -p /mnt >> /mnt/etc/fstab
 
 Edit "/etc/fstab" file:
 
 	nano /mnt/etc/fstab
+	
 	# Replace every "relatime" with "noatime" -> better HDD/SSD IO speed
 	# For the boot partition (probably sda1?) change the "rw" to "ro" - more secure booting process and system runtime
 
@@ -421,19 +426,19 @@ Generate a system partition UUID, i.e. the partition, where you installed the op
     basename /boot/vmlinuz-linux >> /boot/loader/entries/arch.conf
     basename /boot/intel-ucode.img >> /boot/loader/entries/arch.conf
     basename /boot/initramfs-linux.img >> /boot/loader/entries/arch.conf
-    blkid -s PARTUUID -o value /dev/sda2 >> /boot/loader/entries/arch.conf
+    blkid --match-tag UUID --output value /dev/sda2 >> /boot/loader/entries/arch.conf
 
 Open boot configuration file
 
     # Create new file named "arch.conf"
     nano /boot/loader/entries/arch.conf
 	
-Edit bootloader configuration like it is shown below. Ommit the line with "intel-ucode", if you don't have an Intel CPU.
+Edit bootloader configuration like it is shown below. Ommit the line with "intel-ucode", if you don't have an Intel CPU. Example result:
 
     title Arch Linux
     linux /vmlinuz-linux
     initrd /initramfs-linux.img
-    options root=PARTUUID=d65b559b-fe10-43e8-8853-09f55b3fa25d rw
+    options root=UUID=d65b559b-fe10-43e8-8853-09f55b3fa25d rw
     
 Create seed for the random number generator - possible prevention against systemd booting message 'Failed to acquire RNG protocol: not found' [1](https://github.com/systemd/systemd/issues/13503#issuecomment-529525157) and agains journalctl message about 'crng not initialized' - which is not a problem: the systemd will initialize anyway
 
@@ -1912,7 +1917,7 @@ Disable `psi` in kernel parameters. In my case, I'm using `systemd-boot`, so I a
     linux /vmlinuz-linux-tkg-muqss-skylake
     initrd /intel-ucode.img
     initrd /initramfs-linux-tkg-muqss-skylake.img
-    options root=PARTUUID=f4e9c51b-06a6-46e0-9af3-0d8f227a8917 rw psi=0
+    options root=UUID=f4e9c51b-06a6-46e0-9af3-0d8f227a8917 rw psi=0
 
 Sources:
 - https://ck-hack.blogspot.com/2018/12/linux-420-ck1-muqss-version-0185-for.html?showComment=1546575567073#c4526898740671031723
