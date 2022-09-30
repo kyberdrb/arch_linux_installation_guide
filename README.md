@@ -1546,12 +1546,52 @@ And edit its content to something like this:
 At the top we setting system variables VDPAU and LIBVA to enable graphics acceleration for Intel graphics. Then we set up proxy server address for various protocols.
 
 ****************************************
-SSD OPTIMIZATION
 
-Open terminal and type:
-  sudo systemctl enable fstrim.timer
-This will execute TRIM command on all TRIM-capable drives once a week (Periodic TRIM
-Periodic TRIM is safer and more supported and less prone to errors than Continuous TRIM.
+### SSD OPTIMIZATION - TRIM
+
+Check whether the SSD supports TRIM
+
+	lsblk --discard
+	
+If columns `DISC-GRAN` and `DISC-MAX` are non-zero, the drive supports `TRIM`.
+
+Enable Periodic TRIM
+
+	sudo systemctl enable --now fstrim.timer
+	
+This will execute TRIM command on all TRIM-capable drives once a week (Periodic TRIM). You can verify contents of the timer service with command
+
+	systemctl cat fstrim.timer
+	
+Check the status of the service:
+
+	systemctl status fstrim.timer
+	
+    ● fstrim.timer - Discard unused blocks once a week
+         Loaded: loaded (/usr/lib/systemd/system/fstrim.timer; enabled; preset: disabled)
+         Active: active (waiting) since Thu 2022-09-29 11:32:29 CEST; 1 day 5h ago
+          Until: Thu 2022-09-29 11:32:29 CEST; 1 day 5h ago
+        Trigger: Mon 2022-10-03 00:18:54 CEST; 2 days left
+       Triggers: ● fstrim.service
+           Docs: man:fstrim
+
+... and the service, to see that it's triggered by the timer service
+
+	systemctl status fstrim.service
+	
+    ○ fstrim.service - Discard unused blocks on filesystems from /etc/fstab
+        Loaded: loaded (/usr/lib/systemd/system/fstrim.service; static)
+        Active: inactive (dead)
+    TriggeredBy: ● fstrim.timer
+        Docs: man:fstrim(8)
+
+Periodic TRIM is safer, and more supported and less prone to errors than Continuous TRIM. Also,
+
+- Sources:
+	- https://wiki.archlinux.org/title/Solid_state_drive#Periodic_TRIM
+	- https://wiki.archlinux.org/title/Solid_state_drive#Periodic_TRIM
+	- https://duckduckgo.com/?q=check+trim+support+linux&ia=web
+	- https://wiki.archlinux.org/title/Installation_guide
 
 ****************************************
 ## NETWORK MANAGEMENT
