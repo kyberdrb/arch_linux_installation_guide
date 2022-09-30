@@ -2,6 +2,8 @@
 
 ## Create a bootable Arch Linux USB
 
+Skip to the next section, because the creation of an UEFI bootable Arch Linux USB drive had been already automated: see https://github.com/kyberdrb/arch_linux_bootable_uefi_usb_creator
+
 1. Download Arch Linux ISO
 
     - The latest version I tested to boot successfuly was the `archlinux-2021.02.01-x86_64.iso`. The newer ones failed to boot due - kernel panic due to `dell-wmi-sysman` kernel module error
