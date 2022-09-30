@@ -1585,7 +1585,21 @@ Check the status of the service:
     TriggeredBy: ● fstrim.timer
         Docs: man:fstrim(8)
 
-Periodic TRIM is safer, and more supported and less prone to errors than Continuous TRIM. Also,
+Periodic TRIM is safer, and more supported and less prone to errors than Continuous TRIM.
+
+You can run TRIM manually with commands:
+
+    /usr/bin/fstrim --listed-in /etc/fstab:/proc/self/mountinfo --verbose --quiet-unsupported
+
+for running TRIM on all mounted disks, or with
+
+    /usr/bin/fstrim --fstab
+    
+for running TRIM only on entries in `/etc/fstab`, where usually internal disks are present
+
+After the time period indicated in `Trigger` line from the status of the `timer` service it's recommended to check whether the TRIM timer really triggers the TRIM service. Check the logs
+
+    journalctl | grep --ignore-case discard
 
 - Sources:
 	- https://wiki.archlinux.org/title/Solid_state_drive#Periodic_TRIM
