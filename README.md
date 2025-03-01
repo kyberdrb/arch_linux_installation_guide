@@ -300,9 +300,26 @@ fstab using UUIDs:
 Edit "/etc/fstab" file:
 
 	nano /mnt/etc/fstab
+or
+        vim /mnt/etc/fstab
 	
 	# Replace every "relatime" with "noatime" -> better HDD/SSD IO speed
 	# For the boot partition (probably sda1?) change the "rw" to "ro" - more secure booting process and system runtime
+
+Example `/etc/fstab` file
+
+```
+# /dev/sda2
+UUID=cb217b7c-f7c0-4dae-b9a6-412e68b52408	/         	ext4      	rw,noatime,commit=60	0 1
+
+# /dev/sda1
+UUID=220C-B8F7      	/boot     	vfat      	ro,noatime,fmask=0022,dmask=0022,codepage=437,iocharset=iso8859-1,shortname=mixed,utf8,errors=remount-ro	0 2
+```
+
+Explanation:
+
+* `noatime`
+* `commit=60`
 
 ****************************************
 
@@ -320,6 +337,38 @@ Set up hostname
 	cat /etc/hostname
 
 The hostname will be set after next reboot.
+
+****************************************
+
+Finish disk configuration and optimization
+
+quick setup
+
+```
+cat /sys/block/nvme0n1/queue/{scheduler,nr_requests,read_ahead_kb}
+
+echo 2048 | sudo tee /sys/block/nvme0n1/queue/read_ahead_kb
+echo 1024 | sudo tee /sys/block/nvme0n1/queue/nr_requests
+echo 'none' | sudo tee /sys/block/nvme0n1/queue/scheduler
+
+cat /sys/block/nvme0n1/queue/{scheduler,nr_requests,read_ahead_kb}
+```
+
+check `journalctl -b -p 4` for errors occured at parameter setting when the set values don't match
+
+persistent setup
+
+```
+$ sudo vim /etc/udev/rules.d/99-nvme-optimization.rules
+
+ACTION=="add,change", KERNEL=="nvme[0-9]n[0-9]*", SUBSYSTEM=="block", \
+    ATTR{queue/scheduler}="none" # 'none' for minimizing latency for 4K QD1 random read/write, letting the NVMe controller schedule the operations
+```
+
+```
+sudo udevadm control --reload-rules && sudo udevadm trigger --verbose --subsystem-match=block --action=add
+cat /sys/block/nvme0n1/queue/{scheduler,nr_requests,read_ahead_kb}
+```
 
 ****************************************
 
