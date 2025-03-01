@@ -361,11 +361,11 @@ persistent setup
 ```
 $ sudo vim /etc/udev/rules.d/99-nvme-optimization.rules
 
-ACTION=="add,change", KERNEL=="nvme[0-9]n[0-9]*", SUBSYSTEM=="block", \
-    ATTR{queue/scheduler}="none" # 'none' for minimizing latency for 4K QD1 random read/write, letting the NVMe controller schedule the operations
+ACTION=="add|change", KERNEL=="nvme[0-9]n[0-9]*", SUBSYSTEM=="block", ATTR{queue/scheduler}="none" # 'none' for minimizing latency for 4K QD1 random read/write, letting the NVMe controller schedule the operations
 ```
 
 ```
+cat /sys/block/nvme0n1/queue/{scheduler,nr_requests,read_ahead_kb}
 sudo udevadm control --reload-rules && sudo udevadm trigger --verbose --subsystem-match=block --action=add
 cat /sys/block/nvme0n1/queue/{scheduler,nr_requests,read_ahead_kb}
 ```
